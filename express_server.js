@@ -68,13 +68,13 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  const urlToDelete = req.params.shortURL;
+  const urlToDelete = req.params.id;
   delete urlDatabase[urlToDelete];
   res.redirect('/urls');
 });
 
 app.post("/urls/:id/edit", (req, res) => {
-  const key = req.params.shortURL;
+  const key = req.params.id;
   urlDatabase[key] = req.body.longURL;
   res.redirect('/urls')
 });
@@ -91,6 +91,12 @@ app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect('/urls');
 });
+
+app.get("/register", (req, res) => {
+  templateVars = { username:req.cookies['username']}
+  res.render("urls_register", templateVars);
+  res.redirect('/urls');
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
