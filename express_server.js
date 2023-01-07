@@ -12,24 +12,15 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
-  },
-};
+const userDatabase = {
+
+}
 
 
 app.use(express.urlencoded({ extended: true }));
 
 app.post("/urls", (req, res) => {
-  const shortURL = generateShortURL();
+  const shortURL = randomString();
   const newURL = req.body.longURL;
   urlDatabase[shortURL] = newURL;
   res.redirect(`/urls/${shortURL}`);
@@ -38,7 +29,7 @@ app.post("/urls", (req, res) => {
 // redirect to longRIL
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  if (verifyShortUrl(shortURL)) {
+  if (verifyShortUrl(shortURL, urlDatabase)) {
     const longURL = urlDatabase[shortURL];
     res.redirect(longURL);
   } else {
@@ -119,6 +110,7 @@ app.post("/urls/:id/edit", (req, res) => {
   res.redirect('/urls')
 });
 
+
 app.post("/login", (req, res) => {
   const emailUsed = req.body['email-address'];
   const pwdUsed = req.body['password'];
@@ -147,6 +139,21 @@ app.get("/register", (req, res) => {
   res.redirect('/urls');
 })
 
+app.post("/register", (req, res) => {
+  const {password} = req.body;
+  const email = req.body['email-address']
+  if (email === '') {
+    res.status(400).send('Email is required');
+  } else if (password === '') {
+    res.status(400).send('Password is required');
+  } else if (!checkIfAvail(email, userDatabase)) {
+    res.status(400).send('This email is already registered');
+  } else {
+  newUser = addUser(req.body, userDatabase);
+  res.cookie('user_id', newUser.id)
+  res.redirect('/urls');
+}})
+
 const addUser = newUser => {
   const newUserId = generateShortURL();
   newUser.id = newUserId
@@ -163,20 +170,6 @@ const checkIfAvail = (newVal, database) => {
   return true;
 }
 
-app.post("/register", (req, res) => {
-  const {password} = req.body;
-  const email = req.body['email-address']
-  if (email === '') {
-    res.status(400).send('Email is required');
-  } else if (password === '') {
-    res.status(400).send('Password is required');
-  } else if (!checkIfAvail(email, userDatabase)) {
-    res.status(400).send('This email is already registered');
-  } else {
-  newUser = addUser(req.body, userDatabase);
-  res.cookie('user_id', newUser.id)
-  res.redirect('/urls');
-}})
 
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
@@ -213,3 +206,11 @@ const generateShortURL = () => {
 const verifyShortUrl = URL => {
   return urlDatabase[URL];
 };
+
+const fetchUserInfo = (email, database) => {
+  for (key in database) {
+    if (database[key]['email-address'] === email) {
+      return database[key]
+    }
+  }
+}
