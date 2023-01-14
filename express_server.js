@@ -28,6 +28,7 @@ const urlDatabase = {
 
 const userDatabase = {
   'abcd': {id: 'abcd', 'email': 'test@hotmail.com', password: bcrypt.hashSync('1234')},
+  
 };
 
 
@@ -161,7 +162,7 @@ app.get('/urls', (req, res) => {
         res.send('This id is not yours');
     } else {
       const longURL = urlDatabase[shortURL].longURL;
-      let templateVars = { shortURL: shortURL, longURL: longURL, currentUser: user};
+      let templateVars = { shortURL: shortURL, longURL: longURL, currentUser: currentUser(user, userDatabase)};
       res.render("urls_show", templateVars);
     }
   } else {
@@ -191,7 +192,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }})
 // pathway to edit an id, which redirects to urls if error is not caught.
   app.post("/urls/:id/edit", (req, res) => {
-    if (!checkOwner(currentUser(req.session.userId, userDatabase), req.params.id, urlDatabase)) {
+    if (!checkOwner(req.session.userId, req.params.id, urlDatabase)){
       res.send('This id does not belong to you!')
     }
     urlDatabase[req.params.id].longURL = req.body.longURL;
@@ -210,7 +211,6 @@ app.post("/urls/:id/delete", (req, res) => {
 const currentUser = (cookie, database) => {
   for (let ids in database) {
     if (cookie === ids ) {
-      console.log(database, cookie)
       return database[ids]
     }
   }
