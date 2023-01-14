@@ -23,25 +23,25 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## How to use TinyApp
 
-# Register/Login
+### Register/Login
 
 Users must be logged in to create new links, view them, and edit them.
 
 Just click Register on right top, put in your email and password, and you're good to go.
 
-# Create New Links
+### Create New Links
 
 Either click Create a New Short Link in My URLs page, or Create New URL on navigation bar.
 
 Then simply enter the long URL you want to shorten.
 
-# Edit or Delete Short Links
+### Edit or Delete Short Links
 
 In My URLs, you can delete any link you want.
 
 You can also click Edit, and then enter a new long URL to update your link. It will be the same short URL, but redirect to an updated long URL.
 
-# Use Your Short Link
+### Use Your Short Link
 
 The path to use any short link is /u/:shortLink. This will redirect you to the long URL.
 
