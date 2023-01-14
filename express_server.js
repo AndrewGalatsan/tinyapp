@@ -201,7 +201,7 @@ app.post("/urls/:id/delete", (req, res) => {
   
   app.post("/logout", (req, res) => {
     req.session = null;
-    res.redirect('/urls');
+    res.redirect('/logout');
   });
 
   app.listen(PORT, () => {
