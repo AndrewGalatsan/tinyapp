@@ -6,18 +6,13 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 const bcrypt = require("bcryptjs");
 
-const {getUserByEmail } = require('./helpers');
+const {getUserByEmail ,addUser, checkIfAvail, generateRandomString, verifyShortUrl, checkOwner} = require('./helpers');
 
 const cookieSession = require('cookie-session');
 app.use(cookieSession({
   name: 'session',
   keys: ['userId']
 }));
-
-
-
-app.set('view engine', 'ejs');
-
 
 const urlDatabase = {
   "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: 'abcd'},
@@ -30,6 +25,9 @@ const userDatabase = {
   'abcd': {id: 'abcd', 'email': 'test@hotmail.com', password: bcrypt.hashSync('1234')},
   
 };
+
+app.set('view engine', 'ejs');
+
 
 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -220,70 +218,6 @@ const currentUser = (cookie, database) => {
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
-
-// the below contain helper functions.
-
-const addUser = (newUser, database) => {
-  const newUserId = generateRandomString();
-  newUser.id = newUserId;
-  newUser.password = bcrypt.hashSync(newUser.password, 10);
-  database[newUserId] = newUser;
-  return newUser;
-};
-
-const checkIfAvail = (newVal, database) => {
-  for (user in database) {
-    if (!user[newVal]) {
-      return null;
-    }
-  }
-  return true;
-}
-
-
-
-const generateRandomString = () => {
-  const lowerCase = 'abcdefghijklmnopqrstuvwxyz';
-  const upperCase = lowerCase.toUpperCase();
-  const numeric = '1234567890';
-  const alphaNumeric = lowerCase + upperCase + numeric;
-  //alphaNumeric is 62
-  let index = Math.round(Math.random() * 100);
-  if (index > 61) {
-    while (index > 61) {
-      index = Math.round(Math.random() * 100);
-    }
-  }
-  return alphaNumeric[index];
-};
-
-
-const verifyShortUrl = URL => {
-  return urlDatabase[URL];
-};
-
-const fetchUserInfo = (email, database) => {
-  for (key in database) {
-    if (database[key]['email-address'] === email) {
-      return database[key]
-    }
-  }
-}
-
-const checkOwner = (userId, urlID, database) => {
-  return userId === database[urlID].userID;
-};
-
-const urlsForUser = (id, database) => {
-  let currentUserId = id;
-  let usersURLs = {};
-  for (let key in database) {
-    if (database[key].userID === currentUserId) {
-      usersURLs[key] = database[key];
-    }
-  }
-  return usersURLs;
-};
 
 
 
