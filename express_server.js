@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 const bcrypt = require("bcryptjs");
 
-const {getUserByEmail ,addUser, checkIfAvail, generateRandomString, verifyShortUrl, checkOwner} = require('./helpers');
+const {getUserByEmail ,addUser, checkIfAvail, generateRandomString, verifyShortUrl, checkOwner, urlsForUser, urlDatabase, userDatabase} = require('./helpers');
 
 const cookieSession = require('cookie-session');
 app.use(cookieSession({
@@ -14,17 +14,7 @@ app.use(cookieSession({
   keys: ['userId']
 }));
 
-const urlDatabase = {
-  "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: 'abcd'},
 
-  "9sm5xK": {longURL: "http://www.google.com", userID: 'abcd'}
-};
-
-
-const userDatabase = {
-  'abcd': {id: 'abcd', 'email': 'test@hotmail.com', password: bcrypt.hashSync('1234')},
-  
-};
 
 app.set('view engine', 'ejs');
 
@@ -212,6 +202,7 @@ const currentUser = (cookie, database) => {
       return database[ids]
     }
   }
+  return {}
 };
 
 
