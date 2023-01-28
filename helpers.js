@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcryptjs");
 
 const getUserByEmail = (email, database) => {
   for (const user in database) {
@@ -70,6 +70,16 @@ const urlsForUser = (id, database) => {
   return usersURLs;
 };
 
+const urlDatabase = {
+  "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: 'abcd'},
+
+  "9sm5xK": {longURL: "http://www.google.com", userID: 'abcd'}
+};
 
 
-module.exports = { getUserByEmail, addUser, checkIfAvail, generateRandomString, verifyShortUrl, fetchUserInfo, checkOwner, urlsForUser};
+const userDatabase = {
+  'abcd': {id: 'abcd', 'email': 'test@hotmail.com', password: bcrypt.hashSync('1234')},
+  
+};
+
+module.exports = { getUserByEmail, addUser, checkIfAvail, generateRandomString, verifyShortUrl, fetchUserInfo, checkOwner, urlsForUser, urlDatabase, userDatabase};
