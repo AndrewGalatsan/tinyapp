@@ -28,18 +28,8 @@ const checkIfAvail = (newVal, database) => {
 
 
 const generateRandomString = () => {
-  const lowerCase = 'abcdefghijklmnopqrstuvwxyz';
-  const upperCase = lowerCase.toUpperCase();
-  const numeric = '1234567890';
-  const alphaNumeric = lowerCase + upperCase + numeric;
-  //alphaNumeric is 62
-  let index = Math.round(Math.random() * 100);
-  if (index > 61) {
-    while (index > 61) {
-      index = Math.round(Math.random() * 100);
-    }
-  }
-  return alphaNumeric[index];
+  let ran = (Math.random() + 1).toString(36).substring(7);
+  return ran
 };
 
 
@@ -70,6 +60,15 @@ const urlsForUser = (id, database) => {
   return usersURLs;
 };
 
+const currentUser = (cookie, database) => {
+  for (let ids in database) {
+    if (cookie === ids ) {
+      return database[ids]
+    }
+  }
+  return {}
+};
+
 const urlDatabase = {
   "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: 'abcd'},
 
@@ -82,4 +81,4 @@ const userDatabase = {
   
 };
 
-module.exports = { getUserByEmail, addUser, checkIfAvail, generateRandomString, verifyShortUrl, fetchUserInfo, checkOwner, urlsForUser, urlDatabase, userDatabase};
+module.exports = { getUserByEmail, addUser, checkIfAvail, generateRandomString, verifyShortUrl, fetchUserInfo, checkOwner, urlsForUser, urlDatabase, userDatabase, currentUser};

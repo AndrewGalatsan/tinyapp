@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 const bcrypt = require("bcryptjs");
 
-const {getUserByEmail ,addUser, checkIfAvail, generateRandomString, verifyShortUrl, checkOwner, urlsForUser, urlDatabase, userDatabase} = require('./helpers');
+const {getUserByEmail ,addUser, checkIfAvail, generateRandomString, verifyShortUrl, checkOwner, urlsForUser, urlDatabase, userDatabase, currentUser} = require('./helpers');
 
 const cookieSession = require('cookie-session');
 app.use(cookieSession({
@@ -43,10 +43,10 @@ app.get("/urls.json", (req, res) => {
 // register route that redirects you to urls if you're already logged in. Otherwise you will be found in the urls_register page.
 app.get("/register", (req, res) => {
   const user = currentUser(req.session.userId, userDatabase);
-  if (user) {
+  if (user.id) {
     res.redirect('/urls');
   } else {
-    let templateVars = { currentUser: user };
+    let templateVars = { currentUser: {} };
     res.render("urls_register", templateVars);
   }
 });
@@ -103,7 +103,7 @@ app.get('/urls', (req, res) => {
 // login path which if you are logged in, you're redirected to urls, otherwise data of templateVars is pushed to urls_login.
   app.get("/login", (req, res) => {
     const user = currentUser(req.session.userId, userDatabase);
-  if (user) {
+  if (user.id) {
     res.redirect('/urls');
   } else {
     let templateVars = { currentUser: user };
@@ -196,19 +196,7 @@ app.post("/urls/:id/delete", (req, res) => {
     console.log(`Example app listening on port ${PORT}!`);
   });
 
-const currentUser = (cookie, database) => {
-  for (let ids in database) {
-    if (cookie === ids ) {
-      return database[ids]
-    }
-  }
-  return {}
-};
 
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
 
 
 
