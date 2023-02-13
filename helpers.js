@@ -19,11 +19,11 @@ const addUser = (newUser, database) => {
 
 const checkIfAvail = (newVal, database) => {
   for (user in database) {
-    if (!user[newVal]) {
-      return null;
+    if (database[user].email === newVal) {
+      return true;
     }
   }
-  return true;
+  return null;
 }
 
 
@@ -66,7 +66,6 @@ const currentUser = (cookie, database) => {
       return database[ids]
     }
   }
-  return {}
 };
 
 const urlDatabase = {

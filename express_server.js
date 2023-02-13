@@ -43,7 +43,7 @@ app.get("/urls.json", (req, res) => {
 // register route that redirects you to urls if you're already logged in. Otherwise you will be found in the urls_register page.
 app.get("/register", (req, res) => {
   const user = currentUser(req.session.userId, userDatabase);
-  if (user.id) {
+  if (user && user.id) {
     res.redirect('/urls');
   } else {
     let templateVars = { currentUser: {} };
@@ -103,7 +103,7 @@ app.get('/urls', (req, res) => {
 // login path which if you are logged in, you're redirected to urls, otherwise data of templateVars is pushed to urls_login.
   app.get("/login", (req, res) => {
     const user = currentUser(req.session.userId, userDatabase);
-  if (user.id) {
+  if (user && user.id) {
     res.redirect('/urls');
   } else {
     let templateVars = { currentUser: user };
@@ -145,6 +145,12 @@ app.get('/urls', (req, res) => {
   app.get("/urls/:id", (req, res) => {
     let shortURL = req.params.id;
     const user = req.session.userId;
+    if (!user) {
+      return res.status(401).send("You are not logged in")
+    }
+    if (!urlDatabase[shortURL]) {
+      return res.status(404).send("This shorturl doesn't exist")
+    }
     if (verifyShortUrl(shortURL, urlDatabase)) {
       if (user !== urlDatabase[shortURL].userID) {
         res.send('This id is not yours');
@@ -166,22 +172,34 @@ app.get("/u/:id", (req, res) => {
   if (!longURL){
     return res.status(404).send('URL DOES NOT EXIST')
   }
-  res.redirect(longURL)
+  res.redirect(longURL.longURL)
 });
 
 
 // pathway to delete an id, which redirects to urls if error is not caught.
 app.post("/urls/:id/delete", (req, res) => {
+  if (!req.session.userId) {
+      return res.status(401).send("You are not logged in")
+    }
+  if (!urlDatabase[req.params.id]) {
+    return res.status(404).send("This shorturl doesn't exist")
+  }
   if (!checkOwner(req.session.userId, req.params.id, urlDatabase)) {
-    res.send('This id does not belong to you!');
+    res.status(401).send('This id does not belong to you!');
   } else {
     delete urlDatabase[req.params.id];
     res.redirect('/urls');
   }})
 // pathway to edit an id, which redirects to urls if error is not caught.
-  app.post("/urls/:id/edit", (req, res) => {
+  app.post("/urls/:id", (req, res) => {
+    if (!req.session.userId) {
+      return res.status(401).send("You are not logged in")
+    }
+    if (!urlDatabase[req.params.id]) {
+      return res.status(404).send("This shorturl doesn't exist")
+    }
     if (!checkOwner(req.session.userId, req.params.id, urlDatabase)){
-      res.send('This id does not belong to you!')
+      return res.status(401).send('This id does not belong to you!')
     }
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect('/urls')
